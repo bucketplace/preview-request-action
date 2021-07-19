@@ -53,7 +53,7 @@ function run() {
             const imageTag = core.getInput('image-tag', { required: true });
             const imageRepo = core.getInput('image-repo');
             const ingressPrefix = core.getInput('ingress-prefix');
-            yield request_preview_1.requestPreview(application, branch, {
+            const endpoint = yield request_preview_1.requestPreview(application, branch, {
                 profile,
                 destination,
                 base_domain: baseDomain,
@@ -63,6 +63,7 @@ function run() {
                 image_repo: imageRepo ? imageRepo : undefined,
                 ingress_prefix: ingressPrefix ? ingressPrefix : undefined
             });
+            core.setOutput('endpoint', endpoint);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -113,7 +114,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function checkPreviewStatus(application, branch) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const res = yield node_fetch_1.default(`${getBaseUrl()}/applications/${application}/preview/status?${new URLSearchParams({
             branch
@@ -126,10 +127,11 @@ function checkPreviewStatus(application, branch) {
         });
         if (res.status === 202) {
             yield sleep(1000);
-            yield checkPreviewStatus(application, branch);
+            return yield checkPreviewStatus(application, branch);
         }
         else if (res.status !== 200)
             throw Error((_a = (yield res.json())) === null || _a === void 0 ? void 0 : _a.message);
+        return ((_b = (yield res.json())) === null || _b === void 0 ? void 0 : _b.endpoint) || '';
     });
 }
 function requestPreview(application, branch, body, retry_cnt = 0) {
@@ -149,7 +151,7 @@ function requestPreview(application, branch, body, retry_cnt = 0) {
         });
         if (res.status !== 200)
             throw Error((_a = (yield res.json())) === null || _a === void 0 ? void 0 : _a.message);
-        yield checkPreviewStatus(application, branch);
+        return checkPreviewStatus(application, branch);
     });
 }
 exports.requestPreview = requestPreview;

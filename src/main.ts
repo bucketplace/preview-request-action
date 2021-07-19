@@ -16,7 +16,7 @@ async function run(): Promise<void> {
     const imageRepo: string = core.getInput('image-repo')
     const ingressPrefix: string = core.getInput('ingress-prefix')
 
-    await requestPreview(application, branch, {
+    const endpoint = await requestPreview(application, branch, {
       profile,
       destination,
       base_domain: baseDomain,
@@ -26,6 +26,8 @@ async function run(): Promise<void> {
       image_repo: imageRepo ? imageRepo : undefined,
       ingress_prefix: ingressPrefix ? ingressPrefix : undefined
     })
+
+    core.setOutput('endpoint', endpoint)
   } catch (error) {
     core.setFailed(error.message)
   }

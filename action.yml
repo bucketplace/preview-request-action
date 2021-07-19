@@ -32,6 +32,9 @@ inputs:
   ingress-prefix:
     required: false
     description: 'prefix of ingress values'
+outputs:
+  endpoint:
+    description: 'endpoint url of preview service'
 runs:
   using: 'node12'
   main: 'dist/index.js'

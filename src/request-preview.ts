@@ -25,7 +25,7 @@ function sleep(ms: number): Promise<void> {
 async function checkPreviewStatus(
   application: string,
   branch: string
-): Promise<void> {
+): Promise<string> {
   const res = await fetch(
     `${getBaseUrl()}/applications/${application}/preview/status?${new URLSearchParams(
       {
@@ -43,8 +43,10 @@ async function checkPreviewStatus(
 
   if (res.status === 202) {
     await sleep(1000)
-    await checkPreviewStatus(application, branch)
+    return await checkPreviewStatus(application, branch)
   } else if (res.status !== 200) throw Error((await res.json())?.message)
+
+  return (await res.json())?.endpoint || ''
 }
 
 export async function requestPreview(
@@ -61,7 +63,7 @@ export async function requestPreview(
     ingress_prefix?: string
   },
   retry_cnt = 0
-): Promise<void> {
+): Promise<string> {
   if (retry_cnt > 30) throw Error('max retry attempts over!')
 
   const res = await fetch(
@@ -80,5 +82,5 @@ export async function requestPreview(
 
   if (res.status !== 200) throw Error((await res.json())?.message)
 
-  await checkPreviewStatus(application, branch)
+  return checkPreviewStatus(application, branch)
 }
