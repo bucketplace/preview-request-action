@@ -1,0 +1,37 @@
+name: 'Preview Request Action'
+description: 'Action template for preview request'
+author: 'zezaeoh <zezaeoh@github.com>'
+inputs:
+  application:
+    required: true
+    description: 'application id (name)'
+  branch:
+    required: true
+    description: 'branch name'
+  manifest-path:
+    required: true
+    description: 'helm chart manifest path'
+  manifest-repo:
+    required: false
+    description: 'helm chart repository'
+  image-tag:
+    required: true
+    description: 'docker image tag to deploy'
+  image-repo:
+    required: false
+    description: 'docker image repository'
+  profile:
+    required: true
+    description: 'base profile'
+  base-domain:
+    required: true
+    description: 'base domain name'
+  destination:
+    required: true
+    description: 'destination cluster name to deploy'
+  ingress-prefix:
+    required: false
+    description: 'prefix of ingress values'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
