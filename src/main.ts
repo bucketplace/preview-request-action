@@ -5,6 +5,8 @@ async function run(): Promise<void> {
   try {
     const application: string = core.getInput('application', {required: true})
     const branch: string = core.getInput('branch', {required: true})
+    const prTitle: string = core.getInput('pr-title', {required: true})
+    const prUrl: string = core.getInput('pr-url', {required: true})
     const profile: string = core.getInput('profile', {required: true})
     const destination: string = core.getInput('destination', {required: true})
     const baseDomain: string = core.getInput('base-domain', {required: true})
@@ -17,6 +19,8 @@ async function run(): Promise<void> {
     const ingressPrefix: string = core.getInput('ingress-prefix')
 
     const endpoint = await requestPreview(application, branch, {
+      pr_title: prTitle,
+      pr_url: prUrl,
       profile,
       destination,
       base_domain: baseDomain,

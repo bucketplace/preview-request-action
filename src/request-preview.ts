@@ -53,6 +53,8 @@ export async function requestPreview(
   application: string,
   branch: string,
   body: {
+    pr_title: string
+    pr_url: string
     profile: string
     manifest_path: string
     manifest_repo?: string
