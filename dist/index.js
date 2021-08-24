@@ -43,6 +43,8 @@ function run() {
         try {
             const application = core.getInput('application', { required: true });
             const branch = core.getInput('branch', { required: true });
+            const prTitle = core.getInput('pr-title', { required: true });
+            const prUrl = core.getInput('pr-url', { required: true });
             const profile = core.getInput('profile', { required: true });
             const destination = core.getInput('destination', { required: true });
             const baseDomain = core.getInput('base-domain', { required: true });
@@ -54,6 +56,8 @@ function run() {
             const imageRepo = core.getInput('image-repo');
             const ingressPrefix = core.getInput('ingress-prefix');
             const endpoint = yield request_preview_1.requestPreview(application, branch, {
+                pr_title: prTitle,
+                pr_url: prUrl,
                 profile,
                 destination,
                 base_domain: baseDomain,
