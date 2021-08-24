@@ -8,6 +8,12 @@ inputs:
   branch:
     required: true
     description: 'branch name'
+  pr-title:
+    required: true
+    description: 'title of pull request'
+  pr-url:
+    required: true
+    description: 'url of pull request'
   manifest-path:
     required: true
     description: 'helm chart manifest path'
