@@ -63,6 +63,7 @@ export async function requestPreview(
     base_domain: string
     destination: string
     ingress_prefix?: string
+    domain_prefix?: string
   },
   retry_cnt = 0
 ): Promise<string> {
