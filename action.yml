@@ -38,6 +38,9 @@ inputs:
   ingress-prefix:
     required: false
     description: 'prefix of ingress values'
+  domain-prefix:
+    required: false
+    description: 'prefix of domain endpoint'
 outputs:
   endpoint:
     description: 'endpoint url of preview service'

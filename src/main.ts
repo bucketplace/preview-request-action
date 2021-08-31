@@ -17,6 +17,7 @@ async function run(): Promise<void> {
     const imageTag: string = core.getInput('image-tag', {required: true})
     const imageRepo: string = core.getInput('image-repo')
     const ingressPrefix: string = core.getInput('ingress-prefix')
+    const domainPrefix: string = core.getInput('domain-prefix')
 
     const endpoint = await requestPreview(application, branch, {
       pr_title: prTitle,
@@ -28,7 +29,8 @@ async function run(): Promise<void> {
       manifest_repo: manifestRepo ? manifestRepo : undefined,
       image_tag: imageTag,
       image_repo: imageRepo ? imageRepo : undefined,
-      ingress_prefix: ingressPrefix ? ingressPrefix : undefined
+      ingress_prefix: ingressPrefix ? ingressPrefix : undefined,
+      domain_prefix: domainPrefix ? domainPrefix : undefined
     })
 
     core.setOutput('endpoint', endpoint)
