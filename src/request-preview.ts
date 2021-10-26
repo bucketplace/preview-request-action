@@ -55,6 +55,7 @@ export async function requestPreview(
   body: {
     pr_title: string
     pr_url: string
+    pr_assignee: string
     profile: string
     manifest_path: string
     manifest_repo?: string

@@ -14,6 +14,9 @@ inputs:
   pr-url:
     required: true
     description: 'url of pull request'
+  pr-assignee:
+    required: false
+    description: 'assignee of pull request'
   manifest-path:
     required: true
     description: 'helm chart manifest path'
