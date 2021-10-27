@@ -23,7 +23,7 @@ async function run(): Promise<void> {
     const endpoint = await requestPreview(application, branch, {
       pr_title: prTitle,
       pr_url: prUrl,
-      pr_assignee: prAssignee,
+      pr_assignee: prAssignee ? prAssignee : undefined,
       profile,
       destination,
       base_domain: baseDomain,
