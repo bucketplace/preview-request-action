@@ -11,31 +11,25 @@ async function run(): Promise<void> {
     const profile: string = core.getInput('profile', {required: true})
     const destination: string = core.getInput('destination', {required: true})
     const baseDomain: string = core.getInput('base-domain', {required: true})
-    const manifestPath: string = core.getInput('manifest-path', {
-      required: true
-    })
-    const manifestRepo: string = core.getInput('manifest-repo')
     const imageTag: string = core.getInput('image-tag', {required: true})
-    const imageRepo: string = core.getInput('image-repo')
-    const ingressPrefix: string = core.getInput('ingress-prefix')
-    const domainPrefix: string = core.getInput('domain-prefix')
+    const overrideValuesStr: string = core.getInput('override-values')
+    const overrideValues = overrideValuesStr
+      ? JSON.parse(overrideValuesStr)
+      : undefined
 
-    const endpoint = await requestPreview(application, branch, {
+    const {endpoint, context} = await requestPreview(application, branch, {
       pr_title: prTitle,
       pr_url: prUrl,
       pr_assignee: prAssignee ? prAssignee : undefined,
       profile,
       destination,
       base_domain: baseDomain,
-      manifest_path: manifestPath,
-      manifest_repo: manifestRepo ? manifestRepo : undefined,
       image_tag: imageTag,
-      image_repo: imageRepo ? imageRepo : undefined,
-      ingress_prefix: ingressPrefix ? ingressPrefix : undefined,
-      domain_prefix: domainPrefix ? domainPrefix : undefined
+      override_values: overrideValues
     })
 
     core.setOutput('endpoint', endpoint)
+    core.setOutput('context', context)
   } catch (error) {
     core.setFailed(error.message)
   }

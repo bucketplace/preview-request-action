@@ -17,18 +17,9 @@ inputs:
   pr-assignee:
     required: false
     description: 'assignee of pull request'
-  manifest-path:
-    required: true
-    description: 'helm chart manifest path'
-  manifest-repo:
-    required: false
-    description: 'helm chart repository'
   image-tag:
     required: true
     description: 'docker image tag to deploy'
-  image-repo:
-    required: false
-    description: 'docker image repository'
   profile:
     required: true
     description: 'base profile'
@@ -38,15 +29,14 @@ inputs:
   destination:
     required: true
     description: 'destination cluster name to deploy'
-  ingress-prefix:
+  override-values:
     required: false
-    description: 'prefix of ingress values'
-  domain-prefix:
-    required: false
-    description: 'prefix of domain endpoint'
+    description: 'values to override, json format'
 outputs:
   endpoint:
     description: 'endpoint url of preview service'
+  context:
+    description: 'context of preview request'
 runs:
   using: 'node12'
   main: 'dist/index.js'

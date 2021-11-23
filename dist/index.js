@@ -45,31 +45,27 @@ function run() {
             const branch = core.getInput('branch', { required: true });
             const prTitle = core.getInput('pr-title', { required: true });
             const prUrl = core.getInput('pr-url', { required: true });
+            const prAssignee = core.getInput('pr-assignee');
             const profile = core.getInput('profile', { required: true });
             const destination = core.getInput('destination', { required: true });
             const baseDomain = core.getInput('base-domain', { required: true });
-            const manifestPath = core.getInput('manifest-path', {
-                required: true
-            });
-            const manifestRepo = core.getInput('manifest-repo');
             const imageTag = core.getInput('image-tag', { required: true });
-            const imageRepo = core.getInput('image-repo');
-            const ingressPrefix = core.getInput('ingress-prefix');
-            const domainPrefix = core.getInput('domain-prefix');
-            const endpoint = yield request_preview_1.requestPreview(application, branch, {
+            const overrideValuesStr = core.getInput('override-values');
+            const overrideValues = overrideValuesStr
+                ? JSON.parse(overrideValuesStr)
+                : undefined;
+            const { endpoint, context } = yield request_preview_1.requestPreview(application, branch, {
                 pr_title: prTitle,
                 pr_url: prUrl,
+                pr_assignee: prAssignee ? prAssignee : undefined,
                 profile,
                 destination,
                 base_domain: baseDomain,
-                manifest_path: manifestPath,
-                manifest_repo: manifestRepo ? manifestRepo : undefined,
                 image_tag: imageTag,
-                image_repo: imageRepo ? imageRepo : undefined,
-                ingress_prefix: ingressPrefix ? ingressPrefix : undefined,
-                domain_prefix: domainPrefix ? domainPrefix : undefined
+                override_values: overrideValues
             });
             core.setOutput('endpoint', endpoint);
+            core.setOutput('context', context);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -115,14 +111,17 @@ function getAuthToken() {
         throw ReferenceError('There is no token defined in the environment variables');
     return token;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getErrorMsg(obj) {
+    return obj.detail || JSON.stringify(obj, null, 2);
+}
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function checkPreviewStatus(application, branch) {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield node_fetch_1.default(`${getBaseUrl()}/applications/${application}/preview/status?${new URLSearchParams({
+        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/status/?${new URLSearchParams({
             branch
         })}`, {
             method: 'GET',
@@ -136,16 +135,19 @@ function checkPreviewStatus(application, branch) {
             return yield checkPreviewStatus(application, branch);
         }
         else if (res.status !== 200)
-            throw Error((_a = (yield res.json())) === null || _a === void 0 ? void 0 : _a.message);
-        return ((_b = (yield res.json())) === null || _b === void 0 ? void 0 : _b.endpoint) || '';
+            throw Error(getErrorMsg(yield res.json()));
+        const resJson = yield res.json();
+        return {
+            endpoint: (resJson === null || resJson === void 0 ? void 0 : resJson.endpoint) || '',
+            context: JSON.stringify(resJson === null || resJson === void 0 ? void 0 : resJson.context, null, 2) || ''
+        };
     });
 }
 function requestPreview(application, branch, body, retry_cnt = 0) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         if (retry_cnt > 30)
             throw Error('max retry attempts over!');
-        const res = yield node_fetch_1.default(`${getBaseUrl()}/applications/${application}/preview?${new URLSearchParams({
+        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/?${new URLSearchParams({
             branch
         })}`, {
             method: 'POST',
@@ -156,7 +158,7 @@ function requestPreview(application, branch, body, retry_cnt = 0) {
             body: JSON.stringify(body)
         });
         if (res.status !== 200)
-            throw Error((_a = (yield res.json())) === null || _a === void 0 ? void 0 : _a.message);
+            throw Error(getErrorMsg(yield res.json()));
         return checkPreviewStatus(application, branch);
     });
 }
