@@ -50,6 +50,7 @@ function run() {
             const destination = core.getInput('destination', { required: true });
             const baseDomain = core.getInput('base-domain', { required: true });
             const imageTag = core.getInput('image-tag', { required: true });
+            const ingressHostKey = core.getInput('ingress-host-key');
             const overrideValuesStr = core.getInput('override-values');
             const overrideValues = overrideValuesStr
                 ? JSON.parse(overrideValuesStr)
@@ -62,6 +63,7 @@ function run() {
                 destination,
                 base_domain: baseDomain,
                 image_tag: imageTag,
+                ingress_host_key: ingressHostKey ? ingressHostKey : undefined,
                 override_values: overrideValues
             });
             core.setOutput('endpoint', endpoint);

@@ -72,6 +72,7 @@ export async function requestPreview(
     image_tag: string
     base_domain: string
     destination: string
+    ingress_host_key?: string
     override_values?: object
   },
   retry_cnt = 0

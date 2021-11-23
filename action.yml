@@ -29,6 +29,9 @@ inputs:
   destination:
     required: true
     description: 'destination cluster name to deploy'
+  ingress-host-key:
+    required: false
+    description: 'ingress host key in helm chart value'
   override-values:
     required: false
     description: 'values to override, json format'

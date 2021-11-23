@@ -12,6 +12,7 @@ async function run(): Promise<void> {
     const destination: string = core.getInput('destination', {required: true})
     const baseDomain: string = core.getInput('base-domain', {required: true})
     const imageTag: string = core.getInput('image-tag', {required: true})
+    const ingressHostKey: string = core.getInput('ingress-host-key')
     const overrideValuesStr: string = core.getInput('override-values')
     const overrideValues = overrideValuesStr
       ? JSON.parse(overrideValuesStr)
@@ -25,6 +26,7 @@ async function run(): Promise<void> {
       destination,
       base_domain: baseDomain,
       image_tag: imageTag,
+      ingress_host_key: ingressHostKey ? ingressHostKey : undefined,
       override_values: overrideValues
     })
 
