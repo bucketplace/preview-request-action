@@ -17,6 +17,11 @@ function getAuthToken(): string {
   return token
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getErrorMsg(obj: any): string {
+  return obj.detail || JSON.stringify(obj, null, 2)
+}
+
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -25,9 +30,12 @@ function sleep(ms: number): Promise<void> {
 async function checkPreviewStatus(
   application: string,
   branch: string
-): Promise<string> {
+): Promise<{
+  endpoint: string
+  context: string
+}> {
   const res = await fetch(
-    `${getBaseUrl()}/applications/${application}/preview/status?${new URLSearchParams(
+    `${getBaseUrl()}/api/v1/applications/${application}/preview/status/?${new URLSearchParams(
       {
         branch
       }
@@ -44,9 +52,13 @@ async function checkPreviewStatus(
   if (res.status === 202) {
     await sleep(1000)
     return await checkPreviewStatus(application, branch)
-  } else if (res.status !== 200) throw Error((await res.json())?.message)
+  } else if (res.status !== 200) throw Error(getErrorMsg(await res.json()))
 
-  return (await res.json())?.endpoint || ''
+  const resJson = await res.json()
+  return {
+    endpoint: resJson?.endpoint || '',
+    context: JSON.stringify(resJson?.context, null, 2) || ''
+  }
 }
 
 export async function requestPreview(
@@ -57,23 +69,25 @@ export async function requestPreview(
     pr_url: string
     pr_assignee?: string
     profile: string
-    manifest_path: string
-    manifest_repo?: string
     image_tag: string
-    image_repo?: string
     base_domain: string
     destination: string
-    ingress_prefix?: string
-    domain_prefix?: string
+    ingress_host_key?: string
+    override_values?: object
   },
   retry_cnt = 0
-): Promise<string> {
+): Promise<{
+  endpoint: string
+  context: string
+}> {
   if (retry_cnt > 30) throw Error('max retry attempts over!')
 
   const res = await fetch(
-    `${getBaseUrl()}/applications/${application}/preview?${new URLSearchParams({
-      branch
-    })}`,
+    `${getBaseUrl()}/api/v1/applications/${application}/preview/?${new URLSearchParams(
+      {
+        branch
+      }
+    )}`,
     {
       method: 'POST',
       headers: {
@@ -84,7 +98,7 @@ export async function requestPreview(
     }
   )
 
-  if (res.status !== 200) throw Error((await res.json())?.message)
+  if (res.status !== 200) throw Error(getErrorMsg(await res.json()))
 
   return checkPreviewStatus(application, branch)
 }
