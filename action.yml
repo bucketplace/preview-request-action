@@ -8,6 +8,9 @@ inputs:
   branch:
     required: true
     description: 'branch name'
+  release-name-length:
+    required: false
+    description: 'release name length'
   pr-title:
     required: true
     description: 'title of pull request'

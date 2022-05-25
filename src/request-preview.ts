@@ -29,7 +29,8 @@ function sleep(ms: number): Promise<void> {
 
 async function checkPreviewStatus(
   application: string,
-  branch: string
+  branch: string,
+  releaseNameLength: string
 ): Promise<{
   endpoint: string
   context: string
@@ -37,7 +38,8 @@ async function checkPreviewStatus(
   const res = await fetch(
     `${getBaseUrl()}/api/v1/applications/${application}/preview/status/?${new URLSearchParams(
       {
-        branch
+        branch,
+        release_name_length: releaseNameLength
       }
     )}`,
     {
@@ -51,7 +53,7 @@ async function checkPreviewStatus(
 
   if (res.status === 202) {
     await sleep(1000)
-    return await checkPreviewStatus(application, branch)
+    return await checkPreviewStatus(application, branch, releaseNameLength)
   } else if (res.status !== 200) throw Error(getErrorMsg(await res.json()))
 
   const resJson = await res.json()
@@ -64,6 +66,7 @@ async function checkPreviewStatus(
 export async function requestPreview(
   application: string,
   branch: string,
+  releaseNameLength: string,
   body: {
     pr_title: string
     pr_url: string
@@ -85,7 +88,8 @@ export async function requestPreview(
   const res = await fetch(
     `${getBaseUrl()}/api/v1/applications/${application}/preview/?${new URLSearchParams(
       {
-        branch
+        branch,
+        release_name_length: releaseNameLength
       }
     )}`,
     {
@@ -100,5 +104,5 @@ export async function requestPreview(
 
   if (res.status !== 200) throw Error(getErrorMsg(await res.json()))
 
-  return checkPreviewStatus(application, branch)
+  return checkPreviewStatus(application, branch, releaseNameLength)
 }
