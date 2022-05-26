@@ -21,8 +21,10 @@ async function run(): Promise<void> {
 
     const {endpoint, context} = await requestPreview(
       application,
-      branch,
-      releaseNameLength,
+      {
+        branch,
+        release_name_length: releaseNameLength ? releaseNameLength : undefined,
+      },
       {
         pr_title: prTitle,
         pr_url: prUrl,
