@@ -5,6 +5,7 @@ async function run(): Promise<void> {
   try {
     const application: string = core.getInput('application', {required: true})
     const branch: string = core.getInput('branch', {required: true})
+    const releaseNameLength: string = core.getInput('release-name-length')
     const prTitle: string = core.getInput('pr-title', {required: true})
     const prUrl: string = core.getInput('pr-url', {required: true})
     const prAssignee: string = core.getInput('pr-assignee')
@@ -18,7 +19,12 @@ async function run(): Promise<void> {
       ? JSON.parse(overrideValuesStr)
       : undefined
 
-    const {endpoint, context} = await requestPreview(application, branch, {
+    const queryParams: Record<string, string> = {
+      branch
+    }
+    releaseNameLength && (queryParams.release_name_length = releaseNameLength)
+
+    const {endpoint, context} = await requestPreview(application, queryParams, {
       pr_title: prTitle,
       pr_url: prUrl,
       pr_assignee: prAssignee ? prAssignee : undefined,
