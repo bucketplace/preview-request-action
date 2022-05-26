@@ -19,24 +19,22 @@ async function run(): Promise<void> {
       ? JSON.parse(overrideValuesStr)
       : undefined
 
-    const {endpoint, context} = await requestPreview(
-      application,
-      {
-        branch,
-        release_name_length: releaseNameLength ? releaseNameLength : undefined,
-      },
-      {
-        pr_title: prTitle,
-        pr_url: prUrl,
-        pr_assignee: prAssignee ? prAssignee : undefined,
-        profile,
-        destination,
-        base_domain: baseDomain,
-        image_tag: imageTag,
-        ingress_host_key: ingressHostKey ? ingressHostKey : undefined,
-        override_values: overrideValues
-      }
-    )
+    const queryParams: Record<string, string> = {
+      branch
+    }
+    releaseNameLength && (queryParams.release_name_length = releaseNameLength)
+
+    const {endpoint, context} = await requestPreview(application, queryParams, {
+      pr_title: prTitle,
+      pr_url: prUrl,
+      pr_assignee: prAssignee ? prAssignee : undefined,
+      profile,
+      destination,
+      base_domain: baseDomain,
+      image_tag: imageTag,
+      ingress_host_key: ingressHostKey ? ingressHostKey : undefined,
+      override_values: overrideValues
+    })
 
     core.setOutput('endpoint', endpoint)
     core.setOutput('context', context)

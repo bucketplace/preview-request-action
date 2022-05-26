@@ -56,7 +56,11 @@ function run() {
             const overrideValues = overrideValuesStr
                 ? JSON.parse(overrideValuesStr)
                 : undefined;
-            const { endpoint, context } = yield request_preview_1.requestPreview(application, branch, releaseNameLength, {
+            const queryParams = {
+                branch
+            };
+            releaseNameLength && (queryParams.release_name_length = releaseNameLength);
+            const { endpoint, context } = yield request_preview_1.requestPreview(application, queryParams, {
                 pr_title: prTitle,
                 pr_url: prUrl,
                 pr_assignee: prAssignee ? prAssignee : undefined,
@@ -122,12 +126,9 @@ function getErrorMsg(obj) {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function checkPreviewStatus(application, branch, releaseNameLength) {
+function checkPreviewStatus(application, queryParams) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/status/?${new URLSearchParams({
-            branch,
-            release_name_length: releaseNameLength
-        })}`, {
+        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/status/?${new URLSearchParams(queryParams)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,7 +137,7 @@ function checkPreviewStatus(application, branch, releaseNameLength) {
         });
         if (res.status === 202) {
             yield sleep(1000);
-            return yield checkPreviewStatus(application, branch, releaseNameLength);
+            return yield checkPreviewStatus(application, queryParams);
         }
         else if (res.status !== 200)
             throw Error(getErrorMsg(yield res.json()));
@@ -147,14 +148,11 @@ function checkPreviewStatus(application, branch, releaseNameLength) {
         };
     });
 }
-function requestPreview(application, branch, releaseNameLength, body, retry_cnt = 0) {
+function requestPreview(application, queryParams, body, retry_cnt = 0) {
     return __awaiter(this, void 0, void 0, function* () {
         if (retry_cnt > 30)
             throw Error('max retry attempts over!');
-        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/?${new URLSearchParams({
-            branch,
-            release_name_length: releaseNameLength
-        })}`, {
+        const res = yield node_fetch_1.default(`${getBaseUrl()}/api/v1/applications/${application}/preview/?${new URLSearchParams(queryParams)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -164,7 +162,7 @@ function requestPreview(application, branch, releaseNameLength, body, retry_cnt 
         });
         if (res.status !== 200)
             throw Error(getErrorMsg(yield res.json()));
-        return checkPreviewStatus(application, branch, releaseNameLength);
+        return checkPreviewStatus(application, queryParams);
     });
 }
 exports.requestPreview = requestPreview;
