@@ -65,8 +65,10 @@ async function checkPreviewStatus(
 
 export async function requestPreview(
   application: string,
-  branch: string,
-  releaseNameLength: string,
+  queryParams: {
+    branch: string
+    release_name_length?: string
+  }
   body: {
     pr_title: string
     pr_url: string
